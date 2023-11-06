@@ -1,4 +1,5 @@
 require("dotenv").config();
+const express = require("express");
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
@@ -10,7 +11,7 @@ const {
   addAllowedUser,
 } = require("./database");
 const { commands } = require("./commands");
-const { setupMongoDB } = require("./database"); // Import the setupMongoDB function
+const { setupMongoDB } = require("./database");
 const token = process.env.BOT_TOKEN;
 
 const client = new Client({
@@ -21,6 +22,21 @@ const client = new Client({
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+
+// Create an Express web server
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Set up a route to keep the bot active
+app.get("/", (req, res) => {
+  res.send("Bot is active!");
+});
+
+// Start the web server on the specified port
+app.listen(PORT, () => {
+  console.log(`Web server is listening on port ${PORT}`);
+});
+
 client.once("ready", async () => {
   // Call the setupMongoDB function to establish the MongoDB connection
   try {
