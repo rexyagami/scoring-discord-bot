@@ -9,7 +9,6 @@ const {
   getTopScores,
   addAllowedUser,
 } = require("./database");
-const { commands } = require("./commands");
 const { setupMongoDB } = require("./database"); // Import the setupMongoDB function
 const token = process.env.BOT_TOKEN;
 
@@ -28,7 +27,7 @@ client.once("ready", async () => {
     const rest = new REST({ version: "10" }).setToken(token);
 
     rest.put(Routes.applicationCommands(process.env.APPLICATION_ID), {
-      body: commands,
+      body: require("./commands"), // Import the global commands
     });
 
     console.log(`Ready! Logged in as ${client.user.tag}`);
