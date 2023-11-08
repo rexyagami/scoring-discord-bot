@@ -1,5 +1,4 @@
 require("dotenv").config();
-const express = require("express");
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
@@ -11,7 +10,7 @@ const {
   addAllowedUser,
 } = require("./database");
 const { commands } = require("./commands");
-const { setupMongoDB } = require("./database");
+const { setupMongoDB } = require("./database"); // Import the setupMongoDB function
 const token = process.env.BOT_TOKEN;
 
 const client = new Client({
@@ -22,21 +21,6 @@ const client = new Client({
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
-
-// Create an Express web server
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Set up a route to keep the bot active
-app.get("/", (req, res) => {
-  res.send("Bot is active!");
-});
-
-// Start the web server on the specified port
-app.listen(PORT, () => {
-  console.log(`Web server is listening on port ${PORT}`);
-});
-
 client.once("ready", async () => {
   // Call the setupMongoDB function to establish the MongoDB connection
   try {
@@ -195,6 +179,45 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName, options, commandGuildId } = interaction;
   const username = interaction.user.username;
 
+  if (commandName === "configure") {
+    // Check if the user is the server owner
+    if (interaction.user.id === interaction.guild.ownerId) {
+      const serverId = interaction.guild.id;
+      const allowedUsers = interaction.options
+        .getString("allowed_users")
+        .split(",")
+        .map((user) => user.trim());
+      const emojiScores = {};
+      const emojiScorePairs = interaction.options
+        .getString("emoji_scores")
+        .split(",");
+      emojiScorePairs.forEach((pair) => {
+        const [emoji, score] = pair.split("=");
+        emojiScores[emoji.trim()] = parseInt(score.trim());
+      });
+
+      const channelIds =
+        interaction.options.getChannel("allowed_channels") || [];
+      // const allowedChannels = interaction.options.get('allowed_channels').value;
+
+      // Call the function to update server rules with the provided data
+      await updateServerRules(serverId, allowedUsers, emojiScores);
+
+      await interaction.reply({
+        content: "Bot settings have been configured for your server.",
+        ephemeral: true,
+      });
+      return;
+    } else {
+      // User is not the server owner
+      await interaction.reply({
+        content: "Only the server owner can configure the bot.",
+        ephemeral: true,
+      });
+      return;
+    }
+  }
+
   // Retrieve server-specific rules from the database
   const serverRules = await getServerRules(commandGuildId);
 
@@ -237,32 +260,32 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.reply({ content: response.join("\n"), ephemeral: true });
   }
 
-  if (commandName === "configure") {
-    const serverId = interaction.guild.id;
-    const allowedUsers = interaction.options
-      .getString("allowed_users")
-      .split(",")
-      .map((user) => user.trim());
-    const emojiScores = {};
-    const emojiScorePairs = interaction.options
-      .getString("emoji_scores")
-      .split(",");
-    emojiScorePairs.forEach((pair) => {
-      const [emoji, score] = pair.split("=");
-      emojiScores[emoji.trim()] = parseInt(score.trim());
-    });
+  // if (commandName === "configure") {
+  //   const serverId = interaction.guild.id;
+  //   const allowedUsers = interaction.options
+  //     .getString("allowed_users")
+  //     .split(",")
+  //     .map((user) => user.trim());
+  //   const emojiScores = {};
+  //   const emojiScorePairs = interaction.options
+  //     .getString("emoji_scores")
+  //     .split(",");
+  //   emojiScorePairs.forEach((pair) => {
+  //     const [emoji, score] = pair.split("=");
+  //     emojiScores[emoji.trim()] = parseInt(score.trim());
+  //   });
 
-    const channelIds = interaction.options.getChannel("allowed_channels") || [];
-    // const allowedChannels = interaction.options.get('allowed_channels').value;
+  //   const channelIds = interaction.options.getChannel("allowed_channels") || [];
+  //   // const allowedChannels = interaction.options.get('allowed_channels').value;
 
-    // Call the function to update server rules with the provided data
-    await updateServerRules(serverId, allowedUsers, emojiScores);
+  //   // Call the function to update server rules with the provided data
+  //   await updateServerRules(serverId, allowedUsers, emojiScores);
 
-    await interaction.reply({
-      content: "Bot settings have been configured for your server.",
-      ephemeral: true,
-    });
-  }
+  //   await interaction.reply({
+  //     content: "Bot settings have been configured for your server.",
+  //     ephemeral: true,
+  //   });
+  // }
 
   if (commandName === "add_allowed_user") {
     const serverId = interaction.guild.id;
