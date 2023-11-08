@@ -63,7 +63,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
       ephemeral: true,
     });
     console.log(
-      `No server rules found for server ${commandGuildId}. The user ${username} will not be allowed to run bot commands.`
+      `No server rules found for server ${serverId}. The user ${username} will not be allowed to run bot commands.`
     );
     return;
   }
@@ -134,7 +134,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
       ephemeral: true,
     });
     console.log(
-      `No server rules found for server ${commandGuildId}. The user ${username} will not be allowed to run bot commands.`
+      `No server rules found for server ${serverId}. The user ${username} will not be allowed to run bot commands.`
     );
     return;
   }
