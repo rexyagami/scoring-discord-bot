@@ -57,7 +57,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
   // Check if the server rules are added
   if (!serverRules) {
     // No Server Rules found; do not proceed
-    await interaction.reply({
+    reaction.message.channel.send({
       content:
         "Server rules are not set up. Use `/configure` command to set up rules first.",
       ephemeral: true,
@@ -128,7 +128,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
   // Check if the server rules are added
   if (!serverRules) {
     // No Server Rules found; do not proceed
-    await interaction.reply({
+    reaction.message.channel.send({
       content:
         "Server rules are not set up. Use `/configure` command to set up rules first.",
       ephemeral: true,
