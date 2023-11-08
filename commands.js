@@ -62,21 +62,21 @@ const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
   try {
-    // await rest.put(Routes.applicationCommands(process.env.APPLICATION_ID), {
-    //   body: commands,
-    // });
-
-    console.log("Commands => ", commands);
-
-    const response = await rest.put(
-      Routes.applicationCommands(process.env.APPLICATION_ID),
-      { body: commands }
+    console.log(
+      `Started refreshing ${commands.length} application (/) commands.`
     );
 
-    console.log("Response => ",response);
+    // The put method is used to fully refresh all commands in the guild with the current set
+    const data = await rest.put(Routes.applicationCommands(process.env.APPLICATION_ID), {
+      body: commands,
+    });
 
+    console.log(
+      `Successfully reloaded ${data.length} application (/) commands.`
+    );
   } catch (error) {
-    console.error("An error occurred while registering commands:", error);
+    // And of course, make sure you catch and log any errors!
+    console.error(error);
   }
 
 })();
