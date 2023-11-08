@@ -62,15 +62,22 @@ const rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
   try {
-    console.log("Started refreshing application (/) commands.");
-
-    await rest.put(
-    Routes.applicationCommands(process.env.APPLICATION_ID),
-    { body: commands },
+    const response = await rest.put(
+      Routes.applicationCommands(process.env.APPLICATION_ID),
+      { body: commands }
     );
 
-    console.log("Successfully reloaded application (/) commands.");
+    if (response.status === 201) {
+      console.log("Successfully registered commands.");
+    } else {
+      console.error(
+        "Failed to register commands. Status code:",
+        response.status
+      );
+      console.error(await response.text());
+    }
   } catch (error) {
-    console.error(error);
+    console.error("An error occurred while registering commands:", error);
   }
+
 })();
