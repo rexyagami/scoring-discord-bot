@@ -177,6 +177,7 @@ client.on("interactionCreate", async (interaction) => {
 
   const { commandName, options, commandGuildId } = interaction;
   const username = interaction.user.username;
+  const serverID = interaction.guild.id;
 
   if (commandName === "configure") {
     // Check if the user is the server owner
@@ -218,7 +219,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   // Retrieve server-specific rules from the database
-  const serverRules = await getServerRules(commandGuildId);
+  const serverRules = await getServerRules(serverID);
 
   // Check if the server rules are added
   if (!serverRules) {
@@ -229,7 +230,7 @@ client.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     });
     console.log(
-      `No server rules found for server ${commandGuildId}. The user ${username} will not be allowed to run bot commands.`
+      `No server rules found for server ${serverID}. The user ${username} will not be allowed to run bot commands.`
     );
     return;
   }
