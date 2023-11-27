@@ -17,7 +17,8 @@ const commands = [
     options: [
       {
         name: "allowed_users",
-        description: "Usernames or user IDs who are allowed to run bot commands.",
+        description:
+          "Usernames or user IDs who are allowed to run bot commands.",
         type: 3, // Type 3 corresponds to STRING
         required: true,
       },
@@ -44,6 +45,32 @@ const commands = [
   {
     name: "hello",
     description: "Greetings the user.",
+  },
+  {
+    name: "score_from_date_range",
+    description: "Configure bot settings for your server.",
+    options: [
+      {
+        name: "start_date",
+        description:
+          "Enter the starting date from where you want to count the scores. Date format YYYY-MM-DD",
+        type: 3, // Type 3 corresponds to STRING
+        required: true,
+      },
+      {
+        name: "end_date",
+        description:
+          "Enter the ending date till when you want to count the scores. Date format YYYY-MM-DD",
+        type: 3,
+        required: true,
+      },
+      {
+        name: "count",
+        description: "The number of candidates you want to display.",
+        type: 4, // Type 4 corresponds to INTEGER
+        required: true,
+      },
+    ],
   },
 ];
 

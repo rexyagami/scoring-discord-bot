@@ -8,6 +8,9 @@ const {
   updateScore,
   getTopScores,
   addAllowedUser,
+  getScoreLogsByDateRange,
+  compileUserScores,
+  getAllTopScores,
 } = require("./database");
 const { setupMongoDB } = require("./database"); // Import the setupMongoDB function
 const token = process.env.BOT_TOKEN;
@@ -260,33 +263,6 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.reply({ content: response.join("\n"), ephemeral: true });
   }
 
-  // if (commandName === "configure") {
-  //   const serverId = interaction.guild.id;
-  //   const allowedUsers = interaction.options
-  //     .getString("allowed_users")
-  //     .split(",")
-  //     .map((user) => user.trim());
-  //   const emojiScores = {};
-  //   const emojiScorePairs = interaction.options
-  //     .getString("emoji_scores")
-  //     .split(",");
-  //   emojiScorePairs.forEach((pair) => {
-  //     const [emoji, score] = pair.split("=");
-  //     emojiScores[emoji.trim()] = parseInt(score.trim());
-  //   });
-
-  //   const channelIds = interaction.options.getChannel("allowed_channels") || [];
-  //   // const allowedChannels = interaction.options.get('allowed_channels').value;
-
-  //   // Call the function to update server rules with the provided data
-  //   await updateServerRules(serverId, allowedUsers, emojiScores);
-
-  //   await interaction.reply({
-  //     content: "Bot settings have been configured for your server.",
-  //     ephemeral: true,
-  //   });
-  // }
-
   if (commandName === "add_allowed_user") {
     const serverId = interaction.guild.id;
     const allowedUsers = interaction.options.getString("allowed_users");
@@ -309,12 +285,41 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
+  if (commandName === "score_from_date_range") {
+    // Extract options
+    const startDate = options.getString("start_date");
+    const endDate = options.getString("end_date");
+    const count = options.getInteger("count");
+
+    // Convert string dates to Date objects
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+
+    // Retrieve relevant score logs from the database
+    const scoreLogs = await getScoreLogsByDateRange(startDateTime, endDateTime);
+
+    // Compile scores for each user
+    const userScores = compileUserScores(scoreLogs);
+
+    // Get the top scores
+    const topScores = getAllTopScores(userScores, count);
+
+    // Display the top scores
+    interaction.reply({
+      content: `Top ${count} scores from ${startDate} to ${endDate}:\n${topScores.join(
+        "\n"
+      )}`,
+      ephemeral: true,
+    });
+  }
+  
   if (commandName === "hello") {
     await interaction.reply({
       content: "Hello by bot 👀! only to youuuuu",
       ephemeral: true,
     });
   }
+
   if (commandName === "help") {
     await interaction.reply({
       content: "Help by bot 👀! only to youuuuu",

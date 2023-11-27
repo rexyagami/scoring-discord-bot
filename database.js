@@ -202,6 +202,52 @@ async function addAllowedUser(serverId, username) {
   }
 }
 
+async function getScoreLogsByDateRange(startDate, endDate) {
+  await setupMongoDB();
+
+  const db = mongoClient.db();
+  const scoreLogsCollection = db.collection("scoreLogs");
+
+  const scoreLogs = await scoreLogsCollection
+    .find({
+      timestamp: { $gte: startDate, $lte: endDate },
+    })
+    .toArray();
+
+  return scoreLogs;
+}
+
+// Add a new function to compile scores for each user
+function compileUserScores(scoreLogs) {
+  const userScores = {};
+
+  scoreLogs.forEach((log) => {
+    const { scoredUsername, score } = log;
+
+    if (!userScores[scoredUsername]) {
+      userScores[scoredUsername] = 0;
+    }
+
+    userScores[scoredUsername] += score;
+  });
+
+  return userScores;
+}
+
+// Add a new function to get top scores
+function getAllTopScores(userScores, count) {
+  const sortedScores = Object.entries(userScores)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, count);
+
+  // const topScores = sortedScores.map(([userId, score]) => `<@${userId}>: ${score}`);
+  const topScores = sortedScores.map(
+    ([userName, score]) => `${userName}: ${score}`
+  );
+
+  return topScores;
+}
+
 module.exports = {
   setupMongoDB,
   updateServerRules,
@@ -209,4 +255,7 @@ module.exports = {
   updateScore,
   getTopScores,
   addAllowedUser,
+  getScoreLogsByDateRange,
+  compileUserScores,
+  getAllTopScores,
 };
