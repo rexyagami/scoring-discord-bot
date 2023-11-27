@@ -152,7 +152,7 @@ async function updateScore(
   });
 }
 
-// Function to retrieve the top 10 scores for a server
+// Function to retrieve the top X scores for a server
 async function getTopScores(serverId, count) {
   const db = mongoClient.db();
   const scoresCollection = db.collection("scores");
@@ -164,6 +164,19 @@ async function getTopScores(serverId, count) {
     .toArray();
 
   return topScores;
+}
+
+// Function to retrieve all scores for a server
+async function getAllScores(serverId) {
+  const db = mongoClient.db();
+  const scoresCollection = db.collection("scores");
+
+  const allScores = await scoresCollection
+    .find({ serverId })
+    .sort({ score: -1 })
+    .toArray();
+
+  return allScores;
 }
 
 // Function to add allowed users to the server rules
@@ -254,6 +267,7 @@ module.exports = {
   getServerRules,
   updateScore,
   getTopScores,
+  getAllScores,
   addAllowedUser,
   getScoreLogsByDateRange,
   compileUserScores,

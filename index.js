@@ -1,5 +1,14 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+const {
+  Client,
+  GatewayIntentBits,
+  Partials,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const {
@@ -7,6 +16,7 @@ const {
   getServerRules,
   updateScore,
   getTopScores,
+  getAllScores,
   addAllowedUser,
   getScoreLogsByDateRange,
   compileUserScores,
@@ -38,6 +48,73 @@ client.once("ready", async () => {
     console.error("Failed to initialize MongoDB:", error);
   }
 });
+
+// Function to handle the export_all_scores command
+async function handleExportAllScoresCommand(interaction) {
+  const serverId = interaction.guildId;
+
+  const topScores = await getAllScores(serverId);
+
+  const csvData = generateCSVDataFromScores(topScores);
+
+  const filename = `export_all_scores_${Date.now()}.csv`;
+  const filePath = path.join(__dirname, 'temp', filename);
+
+  fs.writeFileSync(filePath, csvData, 'utf-8');
+
+  await interaction.reply({
+    content: "Click the button below to download the CSV file all scores.",
+    files: [
+      {
+        name: filename,
+        attachment: filePath,
+      },
+    ],
+    ephemeral: true,
+  });
+
+  // Delete the temporary file after a certain time (e.g., 1 minute)
+  setTimeout(() => {
+    fs.unlinkSync(filePath);
+    console.log(`Deleted temporary file: ${filename}`);
+  }, 60000); // 60000 milliseconds = 1 minute
+}
+
+// Funcrion to handle export_date_range command
+async function handleDateExportScoresCommand(interaction) {
+  const serverId = interaction.guildId;
+
+  const topScores = await getAllScores(serverId);
+
+  const csvData = generateCSVDataFromScores(topScores);
+
+  const filename = `export_all_scores_${Date.now()}.csv`;
+  const filePath = path.join(__dirname, "temp", filename);
+
+  fs.writeFileSync(filePath, csvData, "utf-8");
+
+  await interaction.reply({
+    content: "Click the button below to download the CSV file all scores.",
+    files: [
+      {
+        name: filename,
+        attachment: filePath,
+      },
+    ],
+    ephemeral: true,
+  });
+
+  // Delete the temporary file after a certain time (e.g., 1 minute)
+  setTimeout(() => {
+    fs.unlinkSync(filePath);
+    console.log(`Deleted temporary file: ${filename}`);
+  }, 60000); // 60000 milliseconds = 1 minute
+}
+function generateCSVDataFromScores(scores) {
+  // Example: Convert scores to CSV format
+  const csvRows = scores.map(score => `${score.username},${score.score}`);
+  return `Username,Score\n${csvRows.join('\n')}`;
+}
 
 // Handle the message reaction add event
 client.on("messageReactionAdd", async (reaction, user) => {
@@ -311,6 +388,14 @@ client.on("interactionCreate", async (interaction) => {
       )}`,
       ephemeral: true,
     });
+  }
+
+  if (commandName === "export_all_scores") {
+    await handleExportAllScoresCommand(interaction);
+  }
+  
+  if (commandName === "export_date_range") {
+    await handleDateExportScoresCommand(interaction);
   }
   
   if (commandName === "hello") {

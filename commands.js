@@ -72,6 +72,10 @@ const commands = [
       },
     ],
   },
+  {
+    name: "export_all_scores",
+    description: "Configure bot settings for your server.",
+  },
 ];
 
 module.exports = commands;
