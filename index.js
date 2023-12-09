@@ -319,7 +319,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!serverRules.allowedUsers.includes(username)) {
     // Username is not allowed; do not proceed
     console.log(
-      `User ${interaction.user.tag} tried to react to a message by ${username} with ${reactionEmoji} but they are not allowed to run bot commands.`
+      `User ${interaction.user.tag} is not allowed to run bot commands.`
     );
     return;
   }
