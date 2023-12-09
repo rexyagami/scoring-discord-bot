@@ -276,6 +276,7 @@ client.on("interactionCreate", async (interaction) => {
       console.log(" => Emoji scores: ", emojiScorePairs);
       emojiScorePairs.forEach((pair) => {
         const [emoji, score] = pair.split("=");
+        console.log(" => Emoji: ", emoji, " Score: ", score);
         emojiScores[emoji.trim()] = parseInt(score.trim());
       });
 
