@@ -262,15 +262,18 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "configure") {
     // Check if the user is the server owner
     if (interaction.user.id === interaction.guild.ownerId) {
+      console.log(`User ${username} is the server owner.`);
       const serverId = interaction.guild.id;
       const allowedUsers = interaction.options
         .getString("allowed_users")
         .split(",")
         .map((user) => user.trim());
+      console.log(" => Allowed users: ", allowedUsers);
       const emojiScores = {};
       const emojiScorePairs = interaction.options
         .getString("emoji_scores")
         .split(",");
+      console.log(" => Emoji scores: ", emojiScorePairs);
       emojiScorePairs.forEach((pair) => {
         const [emoji, score] = pair.split("=");
         emojiScores[emoji.trim()] = parseInt(score.trim());
