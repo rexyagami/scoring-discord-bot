@@ -338,7 +338,7 @@ client.on("interactionCreate", async (interaction) => {
     const topScores = await getTopScores(interaction.guild.id, count);
 
     const response = topScores.map((user, index) => {
-      return `${index + 1}. ${user.username} - ${user.score}`;
+      return `${index + 1}. ${user.username} => ${user.score}`;
     });
 
     await interaction.reply({ content: response.join("\n"), ephemeral: true });
