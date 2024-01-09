@@ -219,7 +219,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
   }
 
   // Check if the username is allowed
-  if (!serverRules.allowedUsers.includes(username)) {
+  if (!serverRules.allowedUsers.includes(scorerUsername)) {
     // Username is not allowed; do not proceed
     console.log(
       `User ${user.tag} tried to react to a message by ${reaction.message.author.tag} with ${reactionEmoji} but they are not allowed to run bot commands.`
