@@ -376,8 +376,11 @@ client.on("interactionCreate", async (interaction) => {
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
 
+    // Get the guild ID where the command was invoked
+    const guildId = interaction.guildId;
+
     // Retrieve relevant score logs from the database
-    const scoreLogs = await getScoreLogsByDateRange(startDateTime, endDateTime);
+    const scoreLogs = await getScoreLogsByDateRange(startDateTime, endDateTime, guildId);
 
     // Compile scores for each user
     const userScores = compileUserScores(scoreLogs);

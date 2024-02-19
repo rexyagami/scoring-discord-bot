@@ -215,7 +215,7 @@ async function addAllowedUser(serverId, username) {
   }
 }
 
-async function getScoreLogsByDateRange(startDate, endDate) {
+async function getScoreLogsByDateRange(startDate, endDate, guildId) {
   await setupMongoDB();
 
   const db = mongoClient.db();
@@ -223,6 +223,7 @@ async function getScoreLogsByDateRange(startDate, endDate) {
 
   const scoreLogs = await scoreLogsCollection
     .find({
+      serverId: guildId, // Filter by server ID
       timestamp: { $gte: startDate, $lte: endDate },
     })
     .toArray();
